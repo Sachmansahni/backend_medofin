@@ -1,0 +1,50 @@
+import json
+from fastapi import APIRouter,FastAPI,Path,Query,Body,Depends,HTTPException
+from mongoengine import connect,Q
+from models import Medicines
+from pydantic import BaseModel
+from urllib.parse import quote_plus
+import re
+
+app6=APIRouter()
+
+class NewMedicine(BaseModel):
+    med_id:int
+    name:str
+    manufacturers:str
+    salt_composition:str
+    medicine_type:str
+    stock:str
+    primary_use:str
+    packaging:str
+    package:str
+    quantity:int
+    product_form:str
+    mrp:int
+    country_of_origin:str
+
+
+
+@app6.post("/add_medicine")
+def add_medicine(medicine: NewMedicine):
+    try:
+        new_medicine = Medicines(
+            med_id=medicine.med_id,
+            name=medicine.name,
+            manufacturers=medicine.manufacturers,
+            salt_composition=medicine.salt_composition,
+            medicine_type=medicine.medicine_type,
+            stock=medicine.stock,
+            primary_use=medicine.primary_use,
+            packaging=medicine.packaging,
+            package=medicine.package,
+            quantity=medicine.quantity,
+            product_form=medicine.product_form,
+            mrp=medicine.mrp,
+            country_of_origin=medicine.country_of_origin
+        )
+        new_medicine.save()
+        return {"message": "Medicine added successfully", "medicine_id": str(new_medicine.id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
